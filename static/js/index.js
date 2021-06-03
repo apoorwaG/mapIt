@@ -1,3 +1,6 @@
+
+let map;
+
 // This will be the object that will contain the Vue attributes
 // and be used to initialize it.
 let app = {};
@@ -6,6 +9,8 @@ let app = {};
 // Given an empty app object, initializes it filling its attributes,
 // creates a Vue instance, and then initializes the Vue instance.
 let init = (app) => {
+
+    app.map = null;
 
     // This is the Vue data.
     app.data = {
@@ -38,6 +43,10 @@ let init = (app) => {
         // Typically this is a server GET call to load the data.
     };
 
+    app.set_map = function (map){
+        app.map = map;
+    };
+
     // Call to the initializer.
     app.init();
 };
@@ -45,3 +54,13 @@ let init = (app) => {
 // This takes the (empty) app object, and initializes it,
 // putting all the code i
 init(app);
+
+function initMap() {
+  map = new google.maps.Map(document.getElementById("map"), {
+    center: { lat: 36.974, lng: -122.030792 },
+    zoom: 14,
+  });
+
+  app.set_map(map);
+
+}
