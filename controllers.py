@@ -29,7 +29,7 @@ from py4web import action, request, abort, redirect, URL
 from yatl.helpers import A
 from .common import db, session, T, cache, auth, logger, authenticated, unauthenticated, flash
 from py4web.utils.url_signer import URLSigner
-from .models import get_user_email
+from .models import get_user_email, get_user_name, get_user
 
 url_signer = URLSigner(session)
 
@@ -39,8 +39,31 @@ def index():
     return dict(
         # COMPLETE: return here any signed URLs you need.
         my_callback_url = URL('my_callback', signer=url_signer),
+        load_location_posts_url = URL('load_location_posts', signer=url_signer),
+        add_location_post_url = URL('add_location_post', signer=url_signer),
     )
 
+# This is our very first API function.
+@action('load_location_posts')
+@action.uses(url_signer.verify(), db)
+def load_location_posts():
+    email = get_user_email()
+    rows = db(db.location_posts).select().as_list()
+    return dict(rows=rows, email = get_user_email())
+
+@action('add_location_post', method="POST")
+@action.uses(url_signer.verify(), db)
+def add_location_post():
+    name = get_user_name()
+    email = get_user_email()
+    print(request.json.get('latLng'),)
+    id = db.location_posts.insert(
+        post_content=request.json.get('post_content'),
+        latLng=request.json.get('latLng'),
+        name=name,
+        email=email
+    )
+    return dict(id=id, name=name, email=email)
 
 @action('map')
 @action.uses(db, auth, 'map.html')
