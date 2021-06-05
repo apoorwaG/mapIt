@@ -12,6 +12,14 @@ let init = (app) => {
 	// This is the Vue data.
 	app.data = {
 		locations: [],
+		rows: [],
+		email: '',
+		post_mode: false,
+		add_post_title: '',
+		add_post_description: '',
+		post_latLng: '',
+		title: true,
+		description: true,
 		// Complete as you see fit.
 	};
 
@@ -24,9 +32,49 @@ let init = (app) => {
 		return a;
 	};
 
+	app.set_post_status = function (new_status) {
+		app.vue.post_mode = new_status;
+	};
+
+	app.add_post = function () {
+		if (app.vue.add_post_title == '') {
+			app.vue.title = false;
+		} else {
+			app.vue.title = true;
+		}
+		if (app.vue.add_post_description == '') {
+			app.vue.description = false;
+		} else {
+			app.vue.description = true;
+		}
+
+		if (app.vue.add_post_title && app.vue.add_post_description) {
+			axios
+				.post(add_location_post_url, {
+					post_description: app.vue.add_post_description,
+					post_title: app.vue.add_post_title,
+					latLng: app.vue.post_latLng,
+				})
+				.then(function (response) {
+					app.vue.rows.push({
+						id: response.data.id,
+						post_description: app.vue.add_post_description,
+						post_title: app.vue.add_post_description,
+						latLng: e.latLng.toJSON(),
+						name: response.data.name,
+						email: response.data.email,
+					});
+					app.enumerate(app.vue.rows);
+				});
+			app.vue.post_mode = false;
+		}
+	};
+
 	// This contains all the methods.
 	app.methods = {
 		// Complete as you see fit.
+		set_post_status: app.set_post_status,
+		add_post: app.add_post,
 	};
 
 	// This creates the Vue instance.
@@ -85,10 +133,13 @@ function initMap() {
 		zoom: 14,
 	});
 
+	markers = null;
+
 	axios
 		.get(load_location_posts_url)
 		.then(function (response) {
 			app.vue.rows = response.data.rows;
+			app.vue.email = response.data.email;
 			app.vue.locations = response.data.rows.map((a) => JSON.parse(a.latLng));
 			console.log(app.vue.locations);
 		})
@@ -105,24 +156,29 @@ function initMap() {
 				});
 			});
 
-			map.addListener('click', (e) => {
-				console.log(e.latLng.toJSON());
-				placeMarkerAndPanTo(e.latLng, map);
-				axios
-					.post(add_location_post_url, {
-						post_content: app.vue.add_post_content,
-						latLng: JSON.stringify(e.latLng.toJSON()),
-					})
-					.then(function (response) {
-						app.vue.rows.push({
-							id: response.data.id,
-							post_content: app.vue.add_post_content,
-							latLng: e.latLng.toJSON(),
-							name: response.data.name,
-							email: response.data.email,
-						});
-					});
-			});
+			console.log('the boolean of email: ' + app.vue.email);
+			if (app.vue.email != null) {
+				map.addListener('click', (e) => {
+					console.log(e.latLng.toJSON());
+					app.set_post_status(true);
+					app.vue.post_latLng = JSON.stringify(e.latLng.toJSON());
+					placeMarkerAndPanTo(e.latLng, map);
+				});
+			}
+
+			var infowindows = [];
+			for (let i = 0; i < markers.length; i++) {
+				console.log('markers length ' + markers.length);
+				const infowindow = new google.maps.InfoWindow({
+					content: '<h1>placeholder</h1>',
+				});
+				infowindows.push(infowindow);
+				console.log('infowindows: ' + infowindows);
+				markers[i].addListener('click', () => {
+					infowindows[i].open(map, markers[i]);
+					console.log('clicks');
+				});
+			}
 
 			app.set_map(map);
 		});

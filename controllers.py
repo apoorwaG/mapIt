@@ -58,12 +58,23 @@ def add_location_post():
     email = get_user_email()
     print(request.json.get('latLng'),)
     id = db.location_posts.insert(
-        post_content=request.json.get('post_content'),
+        post_description=request.json.get('post_description'),
+        post_title=request.json.get('post_title'),
         latLng=request.json.get('latLng'),
         name=name,
         email=email
     )
     return dict(id=id, name=name, email=email)
+
+@action('delete_all', method=["GET", "POST", "DELETE"])
+@action.uses(db, auth)
+def delete():
+    rows = db(db.location_posts).select()
+    for row in rows:
+        db(db.location_posts.id == row.id).delete()
+    
+    return "deleted", 200
+
 
 @action('map')
 @action.uses(db, auth, 'map.html')
