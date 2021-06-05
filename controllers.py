@@ -80,3 +80,6 @@ def delete():
 @action.uses(db, auth, 'map.html')
 def map():
     return dict()
+						
+						
+						

@@ -170,7 +170,10 @@ function initMap() {
 			for (let i = 0; i < markers.length; i++) {
 				console.log('markers length ' + markers.length);
 				const infowindow = new google.maps.InfoWindow({
-					content: '<h1>placeholder</h1>',
+					content:
+						'<div class="box has-background-light">' +
+						markers[i].position +
+						'</div>',
 				});
 				infowindows.push(infowindow);
 				console.log('infowindows: ' + infowindows);
