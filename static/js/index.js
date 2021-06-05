@@ -105,6 +105,8 @@ function initMap() {
 				});
 			});
 
+
+
 			map.addListener('click', (e) => {
 				console.log(e.latLng.toJSON());
 				placeMarkerAndPanTo(e.latLng, map);
@@ -123,6 +125,21 @@ function initMap() {
 						});
 					});
 			});
+
+			var infowindows = [];
+			for(let i = 0; i < markers.length; i++){
+				console.log("markers length " + markers.length)
+				const infowindow = new google.maps.InfoWindow({
+    				content: '<h1>' + markers[i].position + '</h1>',
+  				});
+  				infowindows.push(infowindow)
+  				console.log("infowindows: " + infowindows)
+  				markers[i].addListener("click", () => {
+    				infowindows[i].open(map, markers[i]);
+    				console.log("clicks")
+  				});
+			}
+
 
 			app.set_map(map);
 		});
