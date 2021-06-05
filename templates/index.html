@@ -13,7 +13,7 @@
 
 	<div id="map"></div>
 
-	<div v-if="post_mode" class="container block">
+	<div v-if="post_mode" class="container block p-4">
 		<!-- <form>
 			<div class="group">
 				<input type="text" />
@@ -87,7 +87,7 @@
 
 					<input
 						type="submit"
-						@click="set_post_status(false)"
+						@click="cancel_post"
 						value="Cancel"
 						class="button is-warning"
 					/>

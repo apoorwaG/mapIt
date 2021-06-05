@@ -74,12 +74,6 @@ def delete():
         db(db.location_posts.id == row.id).delete()
     
     return "deleted", 200
-
-
-@action('map')
-@action.uses(db, auth, 'map.html')
-def map():
-    return dict()
-						
+		
 						
 						
