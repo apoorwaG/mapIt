@@ -181,19 +181,20 @@ function initMap() {
 						'<p class="is-size-7 has-text-left has-text-info-dark p-2">' +
 						app.vue.rows[i].name +
 						'</p>' +
-						'</div>' +
-						'<div v-if="r.email == email">
-						<div class="level-right">
-							<a class="level-item">
-								<i
-									@click="delete_contact(r._idx)"
-									class="fa fa-trash"
-									aria-hidden="true"
-									style="color: red"
-								></i>
-							</a>
-						</div>
-					</div>'',
+						'</div>',
+					// 	+
+					// 	'<div v-if="r.email == email">
+					// 	<div class="level-right">
+					// 		<a class="level-item">
+					// 			<i
+					// 				@click="delete_contact(r._idx)"
+					// 				class="fa fa-trash"
+					// 				aria-hidden="true"
+					// 				style="color: red"
+					// 			></i>
+					// 		</a>
+					// 	</div>
+					// </div>',
 				});
 				infowindows.push(infowindow);
 				console.log('infowindows: ' + infowindows);
