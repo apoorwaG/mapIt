@@ -12,6 +12,89 @@
 	<!-- Put here your Vue.js template -->
 
 	<div id="map"></div>
+
+	<div v-if="post_mode" class="container block p-4">
+		<!-- <form>
+			<div class="group">
+				<input type="text" />
+				<label>Normal</label>
+			</div>
+			<div class="group">
+				<input type="text" required="required" />
+				<label>Required</label>
+			</div>
+			<input type="submit" />
+		</form> -->
+
+		<div class="form">
+			<!-- This looks like a form, but is not.  We just need the inputs. -->
+			<div class="field" v-if="title">
+				<div class="control">
+					<label class="label">Title</label>
+					<input
+						type="text"
+						v-model="add_post_title"
+						placeholder="Title"
+						class="input"
+					/>
+				</div>
+			</div>
+
+			<div class="field" v-if="title == false">
+				<div class="control">
+					<label class="label">Title</label>
+					<input
+						type="text"
+						v-model="add_post_title"
+						placeholder="Title"
+						class="input"
+					/>
+				</div>
+				<p class="help is-danger">This field is required</p>
+			</div>
+
+			<div class="field" v-if="description">
+				<div class="control">
+					<label class="label">Description</label>
+					<textarea
+						class="textarea is-info"
+						placeholder="Write a post"
+						v-model="add_post_description"
+					></textarea>
+				</div>
+			</div>
+
+			<div class="field" v-if="description == false">
+				<div class="control">
+					<label class="label">Description</label>
+					<textarea
+						v-model="add_post_description"
+						placeholder="Description"
+						class="textarea is-info"
+					></textarea>
+				</div>
+				<p class="help is-danger">This field is required</p>
+			</div>
+
+			<div class="field">
+				<div class="control">
+					<input
+						type="submit"
+						@click="add_post"
+						value="Post"
+						class="button is-primary"
+					/>
+
+					<input
+						type="submit"
+						@click="cancel_post"
+						value="Cancel"
+						class="button is-warning"
+					/>
+				</div>
+			</div>
+		</div>
+	</div>
 </div>
 
 [[block page_scripts]]

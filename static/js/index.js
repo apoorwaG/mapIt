@@ -12,6 +12,15 @@ let init = (app) => {
 	// This is the Vue data.
 	app.data = {
 		locations: [],
+		markermode: true,
+		rows: [],
+		email: '',
+		post_mode: false,
+		add_post_title: '',
+		add_post_description: '',
+		post_latLng: '',
+		title: true,
+		description: true,
 		// Complete as you see fit.
 	};
 
@@ -24,9 +33,65 @@ let init = (app) => {
 		return a;
 	};
 
+	app.set_post_status = function (new_status) {
+		app.vue.post_mode = new_status;
+	};
+
+	app.cancel_post = function () {
+		app.set_post_status(false);
+		initMap();
+		app.vue.markermode = true;
+		app.vue.reset_form();
+	};
+
+	app.reset_form = function () {
+		app.vue.add_post_title = '';
+		app.vue.add_post_description = '';
+	};
+
+	app.add_post = function () {
+		if (app.vue.add_post_title == '') {
+			app.vue.title = false;
+		} else {
+			app.vue.title = true;
+		}
+		if (app.vue.add_post_description == '') {
+			app.vue.description = false;
+		} else {
+			app.vue.description = true;
+		}
+
+		if (app.vue.add_post_title && app.vue.add_post_description) {
+			axios
+				.post(add_location_post_url, {
+					post_description: app.vue.add_post_description,
+					post_title: app.vue.add_post_title,
+					latLng: app.vue.post_latLng,
+				})
+				.then(function (response) {
+					app.vue.rows.push({
+						id: response.data.id,
+						post_description: app.vue.add_post_description,
+						post_title: app.vue.add_post_description,
+						latLng: e.latLng.toJSON(),
+						name: response.data.name,
+						email: response.data.email,
+					});
+					app.enumerate(app.vue.rows);
+				});
+			app.vue.post_mode = false;
+			app.vue.markermode = true;
+			app.vue.reset_form();
+		}
+	};
+
 	// This contains all the methods.
 	app.methods = {
 		// Complete as you see fit.
+		set_post_status: app.set_post_status,
+		add_post: app.add_post,
+		cancel_post: app.cancel_post,
+		reset_form: app.reset_form,
 	};
 
 	// This creates the Vue instance.
@@ -39,32 +104,6 @@ let init = (app) => {
 	// And this initializes it.
 	app.init = () => {
 		// Put here any initialization code.
-		// Typically this is a server GET call to load the data.
-		// app.vue.locations = [
-		// 	{ lat: -31.56391, lng: 147.154312 },
-		// 	{ lat: -33.718234, lng: 150.363181 },
-		// 	{ lat: -33.727111, lng: 150.371124 },
-		// 	{ lat: -33.848588, lng: 151.209834 },
-		// 	{ lat: -33.851702, lng: 151.216968 },
-		// 	{ lat: -34.671264, lng: 150.863657 },
-		// 	{ lat: -35.304724, lng: 148.662905 },
-		// 	{ lat: -36.817685, lng: 175.699196 },
-		// 	{ lat: -36.828611, lng: 175.790222 },
-		// 	{ lat: -37.75, lng: 145.116667 },
-		// 	{ lat: -37.759859, lng: 145.128708 },
-		// 	{ lat: -37.765015, lng: 145.133858 },
-		// 	{ lat: -37.770104, lng: 145.143299 },
-		// 	{ lat: -37.7737, lng: 145.145187 },
-		// 	{ lat: -37.774785, lng: 145.137978 },
-		// 	{ lat: -37.819616, lng: 144.968119 },
-		// 	{ lat: -38.330766, lng: 144.695692 },
-		// 	{ lat: -39.927193, lng: 175.053218 },
-		// 	{ lat: -41.330162, lng: 174.865694 },
-		// 	{ lat: -42.734358, lng: 147.439506 },
-		// 	{ lat: -42.734358, lng: 147.501315 },
-		// 	{ lat: -42.735258, lng: 147.438 },
-		// 	{ lat: -43.999792, lng: 170.463352 },
-		// ];
 	};
 
 	app.set_map = function (map) {
@@ -85,10 +124,13 @@ function initMap() {
 		zoom: 14,
 	});
 
+	markers = null;
+
 	axios
 		.get(load_location_posts_url)
 		.then(function (response) {
 			app.vue.rows = response.data.rows;
+			app.vue.email = response.data.email;
 			app.vue.locations = response.data.rows.map((a) => JSON.parse(a.latLng));
 			console.log(app.vue.locations);
 		})
@@ -105,24 +147,61 @@ function initMap() {
 				});
 			});
 
-			map.addListener('click', (e) => {
-				console.log(e.latLng.toJSON());
-				placeMarkerAndPanTo(e.latLng, map);
-				axios
-					.post(add_location_post_url, {
-						post_content: app.vue.add_post_content,
-						latLng: JSON.stringify(e.latLng.toJSON()),
-					})
-					.then(function (response) {
-						app.vue.rows.push({
-							id: response.data.id,
-							post_content: app.vue.add_post_content,
-							latLng: e.latLng.toJSON(),
-							name: response.data.name,
-							email: response.data.email,
-						});
-					});
-			});
+			console.log('the boolean of email: ' + app.vue.email);
+			console.log('maerkmode is : ' + app.vue.markermode);
+			if (app.vue.email != null) {
+				map.addListener('click', (e) => {
+					if (app.vue.markermode) {
+						console.log(' line 173maerkmode is : ' + app.vue.markermode);
+						console.log(e.latLng.toJSON());
+						app.set_post_status(true);
+						app.vue.post_latLng = JSON.stringify(e.latLng.toJSON());
+						placeMarkerAndPanTo(e.latLng, map);
+					}
+					app.vue.markermode = false;
+				});
+			}
+
+			var infowindows = [];
+			for (let i = 0; i < markers.length; i++) {
+				console.log('markers length ' + markers.length);
+				const infowindow = new google.maps.InfoWindow({
+					content:
+						'<h1 class="title is-4 has-text-centered">' +
+						app.vue.rows[i].post_title +
+						//'\n' +
+						'</h1>' +
+						'<div class = "block">' +
+						'<img width ="300" src="https://storage.googleapis.com/post_image_uploads/cf1c2842-bf43-11eb-a7cd-10ddb1b271fe.JPG" alt="Doenst work">' +
+						'</div>' +
+						'<div class="box has-background-light" style="width: 300px;">' +
+						'<p class="is-size-6">' +
+						app.vue.rows[i].post_description +
+						'</p>' +
+						'<p class="is-size-7 has-text-left has-text-info-dark p-2">' +
+						app.vue.rows[i].name +
+						'</p>' +
+						'</div>' +
+						'<div v-if="r.email == email">
+						<div class="level-right">
+							<a class="level-item">
+								<i
+									@click="delete_contact(r._idx)"
+									class="fa fa-trash"
+									aria-hidden="true"
+									style="color: red"
+								></i>
+							</a>
+						</div>
+					</div>'',
+				});
+				infowindows.push(infowindow);
+				console.log('infowindows: ' + infowindows);
+				markers[i].addListener('click', () => {
+					infowindows[i].open(map, markers[i]);
+					console.log('clicks');
+				});
+			}
 
 			app.set_map(map);
 		});

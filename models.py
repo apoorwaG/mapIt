@@ -27,7 +27,8 @@ def get_time():
 ## always commit your models to avoid problems later
 
 db.define_table('location_posts',
-                Field('post_content'),
+                Field('post_description'),
+                Field('post_title'),
                 Field('name'),
                 Field('email'),
                 Field('latLng'),
