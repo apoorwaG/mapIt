@@ -41,6 +41,7 @@ def index():
         my_callback_url = URL('my_callback', signer=url_signer),
         load_location_posts_url = URL('load_location_posts', signer=url_signer),
         add_location_post_url = URL('add_location_post', signer=url_signer),
+        delete_post_url=URL('delete_post', signer=url_signer),
     )
 
 # This is our very first API function.
@@ -74,6 +75,20 @@ def delete():
         db(db.location_posts.id == row.id).delete()
     
     return "deleted", 200
-		
-						
-						
+
+#
+# @action('delete/<location_post_id:int>')
+# @action.uses(db, session, auth.user)
+# def delete(location_post_id=None):
+#     print("controller")
+#     assert location_post_id is not None
+#     db(db.location_posts.id == location_post_id).delete()
+#     redirect(URL('index'))
+
+@action('delete_post')
+@action.uses(db, url_signer.verify())
+def delete_post():
+    id = request.params.get('id')
+    assert id is not None
+    db(db.location_posts.id == id).delete()
+    return "ok"

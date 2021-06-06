@@ -21,6 +21,7 @@ let init = (app) => {
 		post_latLng: '',
 		title: true,
 		description: true,
+		delete_url: delete_post_url,
 		// Complete as you see fit.
 	};
 
@@ -85,6 +86,24 @@ let init = (app) => {
 		}
 	};
 
+	app.delete_post = function(row_idx){
+        // this is the actual row's id
+        app.post_mode = false;
+        console.log("delete");
+        let id = app.vue.rows[row_idx].id;
+        axios.get(delete_post_url, {params: {id: id}}).then(function (response) {
+            for (let i = 0; i < app.vue.rows.length; i++){
+                if (app.vue.rows[i].id === id){
+                    app.vue.rows.splice(i, 1);
+                    app.enumerate(app.vue.rows);
+                    break;
+                }
+            }
+        });
+        //initMap();
+        app.post_mode = true;
+    };
+
 	// This contains all the methods.
 	app.methods = {
 		// Complete as you see fit.
@@ -92,6 +111,7 @@ let init = (app) => {
 		add_post: app.add_post,
 		cancel_post: app.cancel_post,
 		reset_form: app.reset_form,
+		delete_post: app.delete_post,
 	};
 
 	// This creates the Vue instance.
@@ -144,9 +164,10 @@ function initMap() {
 				return new google.maps.Marker({
 					position: location,
 					map,
+					animation: google.maps.Animation.DROP,
 				});
-			});
 
+			});
 			console.log('the boolean of email: ' + app.vue.email);
 			console.log('maerkmode is : ' + app.vue.markermode);
 			if (app.vue.email != null) {
@@ -164,7 +185,7 @@ function initMap() {
 
 			var infowindows = [];
 			for (let i = 0; i < markers.length; i++) {
-				console.log('markers length ' + markers.length);
+				//console.log('markers length ' + markers.length);
 				const infowindow = new google.maps.InfoWindow({
 					content:
 						'<h1 class="title is-4 has-text-centered">' +
@@ -175,13 +196,45 @@ function initMap() {
 						'<img width ="300" src="https://storage.googleapis.com/post_image_uploads/cf1c2842-bf43-11eb-a7cd-10ddb1b271fe.JPG" alt="Doenst work">' +
 						'</div>' +
 						'<div class="box has-background-light" style="width: 300px;">' +
-						'<p class="is-size-6">' +
-						app.vue.rows[i].post_description +
-						'</p>' +
-						'<p class="is-size-7 has-text-left has-text-info-dark p-2">' +
-						app.vue.rows[i].name +
-						'</p>' +
-						'</div>',
+                            '<p class="is-size-6">' +
+                            app.vue.rows[i].post_description +
+                            '</p>' +
+                            '<p class="is-size-7 has-text-left has-text-info-dark p-2">' +
+                            app.vue.rows[i].name +
+                            '</p>' +
+						'</div>'+
+						'<div>' +
+						//'<div class="level-right">' +
+//					 		'<a class="button is-danger">' +
+//					 		    '<span class="icon">' +
+//					 			'<i ' +
+//					 				'@click="delete_post(' + String(app.vue.rows[i].id) + ')"'+
+//					 				'class="fa fa-fw fa-trash"' +
+//					 				//'aria-hidden="true"' +
+//					 				//'style="color: red"'+
+//					 			'></i>' +
+//					 			'</span>'+
+//					 		'</a>'+
+					 	//'</div>'+
+
+//						'<a class="button is-danger" href="'+ app.vue.delete_url + String(app.vue.rows[i].id) + '">' +
+//                            '<span class="icon"><i class="fa fa-fw fa-trash"></i></span>' +
+//                         '</a>' +
+
+                               '<div class = "level-right">'+
+                              '<button onclick = "app.delete_post(' + i +')" class="button is-ghost has-text-danger icon is-medium">'+
+                               '<i class = "fa fa-trash"></i>'+
+                              '</button>'+
+                          '</div>'+
+
+
+                         '</div>'+
+                         '</div>'+
+                         '<script>'+
+                         'let delete_post_url = \'[[=XML(delete_post_url)]]\';'+
+                         '</script>'+
+                         '<script src="js/index.js"></script>',
+
 					// 	+
 					// 	'<div v-if="r.email == email">
 					// 	<div class="level-right">
@@ -196,12 +249,14 @@ function initMap() {
 					// 	</div>
 					// </div>',
 				});
+				console.log(delete_post_url);
 				infowindows.push(infowindow);
 				console.log('infowindows: ' + infowindows);
 				markers[i].addListener('click', () => {
 					infowindows[i].open(map, markers[i]);
 					console.log('clicks');
 				});
+
 			}
 
 			app.set_map(map);
