@@ -76,6 +76,42 @@
 				<p class="help is-danger">This field is required</p>
 			</div>
 
+			<div class="field" v-if="image">
+				<p class="control">
+					<div class="file is-info">
+						<label class="file-label">
+						<input class="file-input" type="file"
+								accept=".jpg, .png, .jpeg, .gif, .bmp, .tif, .tiff|image/*"
+								@change="upload_file($event)">
+						<span class="file-cta">
+							<span class="file-label">
+							<span>Add image</span>
+							</span>
+						</span>
+						</label>
+					</div>
+				</p>
+				<p v-if="image_name" class="help is-success">Uploaded {{image_name}}</p>
+		    </div>
+
+		    <div class="field" v-if="image == false">
+				<div class="control">
+					<div class="file is-info">
+						<label class="file-label">
+						<input class="file-input" type="file"
+								accept=".jpg, .png, .jpeg, .gif, .bmp, .tif, .tiff|image/*"
+								@change="upload_file($event)">
+						<span class="file-cta">
+							<span class="file-label">
+							<span>Add image</span>
+							</span>
+						</span>
+						</label>
+					</div>
+				</div>
+				<p class="help is-danger"> field is required</p>
+	  		</div>
+
 			<div class="field">
 				<div class="control">
 					<input
@@ -100,9 +136,27 @@
 [[block page_scripts]]
 <!-- Loads the index-specific js for Vue -->
 <script>
+	function myFunction(id, i) {
+		axios
+			.get(delete_post_url, { params: { id: id } })
+			.then(function (response) {
+				// for (let i = 0; i < app.vue.rows.length; i++) {
+				// 	if (app.vue.rows[i].id === id) {
+				// 		app.vue.rows.splice(i, 1);
+				// 		app.enumerate(app.vue.rows);
+				// 		break;
+				// 	}
+				// }
+				
+				myFunction2(i);
+			});
+	}
 	let my_callback_url = '[[=XML(my_callback_url)]]';
 	let load_location_posts_url = '[[=XML(load_location_posts_url)]]';
 	let add_location_post_url = '[[=XML(add_location_post_url)]]';
+	let upload_image_url = '[[=XML(upload_image_url)]]';
+	let obtain_gcs_url = "[[=XML(obtain_gcs_url)]]";
+	let delete_post_url = "[[=XML(delete_post_url)]]";
 </script>
 <script src="js/index.js"></script>
 <script
