@@ -1,1 +1,1 @@
-# mapsTutorial, previously Location Discovery
+# mapIt!, previously Location Discovery
